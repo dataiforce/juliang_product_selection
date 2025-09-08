@@ -1,6 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-from db.models.selection import PromotionProduct, SaleContent, Material
+from db.models.selection import PromotionProduct, SaleContent
+from db.models.upload import Material
 from sqlalchemy import select
 import datetime
 from sqlalchemy import inspect

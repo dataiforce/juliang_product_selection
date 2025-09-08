@@ -2,6 +2,12 @@ import random
 import time
 from DrissionPage._pages.mix_tab import MixTab
 from urllib.parse import urlparse, parse_qs
+from pathlib import Path
+import json
+from typing import List, Dict
+import re
+
+
 
 def cubic_bezier(p0, p1, p2, p3, t):
     """三次贝塞尔曲线插值"""
@@ -101,3 +107,92 @@ def is_dynamic(resp) -> bool:
     :return: True if dynamic, else False
     """
     return resp.request.postData.get("data_module") == "dynamic"
+
+
+def save_json(data: dict, filepath: str, indent: int = 4) -> None:
+    """
+    将数据保存为 JSON 文件
+    :param data: 要保存的字典或列表
+    :param filepath: 保存路径，例如 "output.json"
+    :param indent: 缩进，默认 4
+    """
+    path = Path(filepath)
+    path.parent.mkdir(parents=True, exist_ok=True)  # 确保目录存在
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=indent)
+
+
+def load_json(filepath: str):
+    """
+    从 JSON 文件读取数据
+    :param filepath: 文件路径，例如 "output.json"
+    :return: 读取到的对象（dict / list），如果文件不存在则返回 None
+    """
+    path = Path(filepath)
+    if not path.exists():
+        return None
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+    
+
+def append_dicts_to_json(file_path: str, new_dicts: List[Dict]):
+    file = Path(file_path)
+    file.parent.mkdir(parents=True, exist_ok=True)  # 确保目录存在
+
+    if file.exists():
+        with open(file, "r", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    raise ValueError("文件内容不是 [dict] 结构")
+            except json.JSONDecodeError:
+                data = []
+    else:
+        data = []
+    
+    data.extend(new_dicts)
+    
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    
+    return len(data)
+
+
+
+def safe_filename(name) -> str|None:
+    """
+    移除文件名中非法字符，返回可作为文件名的字符串
+    """
+    # Windows 不允许的字符: \ / : * ? " < > |
+    if name is None:
+        return None
+    return re.sub(r'[\\/:*?"<>|]', '', name)
+
+def mark_done(file_path, target, done_type="list_done"):
+    target_path = set_category_path(target)
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    for item in data:
+        if set_category_path(item) == target_path:
+            item[done_type] = True
+            break
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def is_done(file_path, target, done_type="list_done"):
+    target_path = set_category_path(target)
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    for item in data:
+        if set_category_path(item) == target_path:
+            return item.get(done_type, False)
+    return False
+
+def set_category_path(category):
+    return "/".join(
+        str(v) for v in [
+            safe_filename(category.get("first")),
+            safe_filename(category.get("second")),
+            safe_filename(category.get("third")),
+        ] if v is not None
+    )

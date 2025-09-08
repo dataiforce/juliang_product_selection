@@ -18,6 +18,8 @@ class AppToken(Base):
     refresh_token_expires_in = Column(Integer, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.datetime.now(pytz.timezone("Asia/Shanghai")), nullable=False)
 
+    qianchuan_douyin_logo = Column(Integer, default=0)
+    platform_id = Column(String)
 
 class ApiCallLog(Base):
     __tablename__ = "api_call_logs"

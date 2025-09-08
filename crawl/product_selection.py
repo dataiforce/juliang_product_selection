@@ -506,8 +506,8 @@ class AutoProductSelection:
                     "shop_id": obj.shop_id,
                     "shop_name": obj.shop_name,
                     "content_id": sale_data["content_id"],
-                    "video_path": f"/data/public/remove_face_video/{promotion_id}",
-                    "video_name": f'{sale_data["content_id"]}.mp4',
+                    # "video_path": f"/data/public/remove_face_video/{promotion_id}",
+                    # "video_name": f'{sale_data["content_id"]}.mp4',
                     "is_qianchuan": 1,
                 }
                 material = insert_material(self.session, material_data)

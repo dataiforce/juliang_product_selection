@@ -13,6 +13,7 @@ class AdPlan(Base):
     name = Column(String, comment="推广计划名称")
     aweme_id = Column(String, comment="抖音ID")
     marketing_goal = Column(String, comment="营销目标")
+    platform_id = Column(String, comment="千川ID或抖音ID")
     raw_data = Column(Text, comment="序列化后原始数据json")
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.datetime.now(pytz.timezone("Asia/Shanghai")), comment="创建时间")
 
